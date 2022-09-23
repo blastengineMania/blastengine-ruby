@@ -6,3 +6,6 @@
 /pkg/
 /spec/reports/
 /tmp/
+.DS_Store
+spec/test.jpg
+spec/config.json

@@ -6,3 +6,6 @@ gemspec
 
 gem "rake", "~> 13.0"
 gem "rspec", "~> 3.9"
+gem "faraday"
+gem "faraday-multipart"
+gem "mini_mime"
