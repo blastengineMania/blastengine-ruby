@@ -8,6 +8,9 @@ module Blastengine
 			@encode = "UTF-8"
 		end
 
+		#
+		# 送信主の追加
+		#
 		def from(email, name = "")
 			@_from = {email: email, name: name}
 		end

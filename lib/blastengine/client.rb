@@ -64,7 +64,7 @@ module Blastengine
 		# APIリクエストを行うFaradayのインスタンスを返す
 		# 添付ファイルの有無によって返すオブジェクトが異なる
 		#
-		def conn(attachment_count)
+		def conn(attachment_count = 0)
 			# 共通の設定
 			url = "https://#{DOMAIN}"
 			headers = {
@@ -93,7 +93,7 @@ module Blastengine
 		#
 		# POSTリクエスト用のデータを生成する
 		#
-		def post_data(data, attachments)
+		def post_data(data, attachments = [])
 			# 添付ファイルがない場合は、データをJSONに変換して返す
 			return data.to_json if attachments.length == 0
 			# 添付ファイルがある場合はファイルを読み込んで返す
@@ -115,6 +115,41 @@ module Blastengine
 			params = self.post_data data, attachments
 			# リクエスト実行
 			res = self.conn(attachments.size).post("#{BASE_PATH}#{path}", params)
+			# レスポンスを処理
+			return self.handle_response res
+		end
+
+		#
+		# PUTリクエストを行う
+		#
+		def put(path, data)
+			# リクエスト実行
+			res = self.conn.put("#{BASE_PATH}#{path}", data.to_json)
+			# レスポンスを処理
+			return self.handle_response res
+		end
+
+		#
+		# PATCHリクエストを行う
+		#
+		def patch(path, data)
+			# リクエスト実行
+			res = self.conn.patch("#{BASE_PATH}#{path}", data.to_json)
+			# レスポンスを処理
+			return self.handle_response res
+		end
+
+		def delete(path)
+			# リクエスト実行
+			res = self.conn.delete("#{BASE_PATH}#{path}")
+			# レスポンスを処理
+			return self.handle_response res
+		end
+
+		#
+		# レスポンスのハンドリング用
+		# 
+		def handle_response(res)
 			# レスポンスをJSONパース
 			json = JSON.parse res.body
 			# 200または201なら、レスポンスを返す
@@ -124,6 +159,5 @@ module Blastengine
 			@@last_error = Blastengine::Error.new message
 			raise @@last_error
 		end
-
 	end
 end

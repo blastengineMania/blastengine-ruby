@@ -3,6 +3,7 @@
 require_relative "blastengine/version"
 require "blastengine/client"
 require "blastengine/transaction"
+require "blastengine/bulk"
 
 module Blastengine
   class Error < StandardError; end
