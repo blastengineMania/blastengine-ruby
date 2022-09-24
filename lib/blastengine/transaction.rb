@@ -11,7 +11,7 @@ module Blastengine
 		#
 		# 送信主の追加
 		#
-		def from(email, name = "")
+		def from(email:, name: "")
 			@_from = {email: email, name: name}
 		end
 

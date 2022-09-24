@@ -10,7 +10,7 @@ RSpec.describe 'Transaction test' do
     context 'Send email' do
       it "Success to send text email" do
 				transaction = Blastengine::Transaction.new
-				transaction.from config["from"]["email"], config["from"]["name"]
+				transaction.from email: config["from"]["email"], name: config["from"]["name"]
 				transaction.to << config["to"]
 				transaction.subject = "Test email"
 				transaction.text_part = "This is a test email"
@@ -24,7 +24,7 @@ RSpec.describe 'Transaction test' do
 			end
       it "Success to send email w/ attachment" do
 				transaction = Blastengine::Transaction.new
-				transaction.from config["from"]["email"], config["from"]["name"]
+				transaction.from email: config["from"]["email"], name: config["from"]["name"]
 				transaction.to << config["to"]
 				transaction.subject = "Test email w/ attachments"
 				transaction.text_part = "This is a test email with attachments"

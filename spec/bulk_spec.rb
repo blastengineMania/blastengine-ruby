@@ -10,7 +10,7 @@ RSpec.describe 'Bulk test' do
     context 'Send email' do
       it "Success to send text email" do
 				bulk = Blastengine::Bulk.new
-				bulk.from config["from"]["email"], config["from"]["name"]
+				bulk.from email: config["from"]["email"], name: config["from"]["name"]
 				bulk.subject = "Test bulk email"
 				bulk.text_part = "This is a test email to __name__"
 				begin
@@ -26,7 +26,7 @@ RSpec.describe 'Bulk test' do
 			end
       it "Success to send text email w/ time" do
 				bulk = Blastengine::Bulk.new
-				bulk.from config["from"]["email"], config["from"]["name"]
+				bulk.from email: config["from"]["email"], name: config["from"]["name"]
 				bulk.subject = "Test bulk email, 2 minute later"
 				bulk.text_part = "This is a test email to __name__"
 				begin
