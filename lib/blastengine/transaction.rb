@@ -1,9 +1,11 @@
 module Blastengine
-	class Transaction
+	class Transaction < Base
 		include Blastengine
-		attr_accessor :to, :subject, :text_part, :encode, :html_part, :attachments
+		attr_accessor :to, :cc, :bcc, :subject, :text_part, :encode, :html_part, :attachments
 		def initialize
-			@to = []
+			@to = ""
+			@cc = []
+			@bcc = []
 			@attachments = []
 			@encode = "UTF-8"
 		end
@@ -24,7 +26,9 @@ module Blastengine
 			# APIリクエスト用のデータ
 			data = {
 				from: @_from,
-				to: @to.join(","),
+				to: @to,
+				cc: @cc,
+				bcc: @bcc,
 				subject: @subject,
 				encode: @encode,
 				text_part: @text_part,

@@ -35,7 +35,7 @@ client = Blastengine.initialize api_key: "API_KEY", user_name: "YOUR_USER_NAME"
 ```ruby
 transaction = Blastengine::Transaction.new
 transaction.from "admin@example.com", "Administrator"
-transaction.to << "user@example.jp"
+transaction.to = "user@example.jp"
 transaction.subject = "Test subject"
 transaction.text_part = "This is a test email"
 transaction.html_part = "<H1>Hello, world!</h1>"
@@ -47,13 +47,60 @@ delivery_id = transaction.send
 ```ruby
 transaction = Blastengine::Transaction.new
 transaction.from "admin@example.com", "Administrator"
-transaction.to << "user@example.jp"
+transaction.to = "user@example.jp"
 transaction.subject = "Test subject"
 transaction.text_part = "This is a test email"
 transaction.html_part = "<H1>Hello, world!</h1>"
 transaction.attachments << "README.md"
 transaction.attachments << "./spec/test.jpg"
 delivery_id = transaction.send
+```
+
+### バルクメール
+
+```ruby
+bulk = Blastengine::Bulk.new
+bulk.from "admin@example.com", "Administrator"
+bulk.subject = "Test bulk email"
+bulk.text_part = "This is a test email to __name__"
+# Register email as template
+bulk.register
+
+# Add address
+bulk.add "test1@example.jp", {name: "User 1"}
+bulk.add "test2@example.jp", {name: "User 2"}
+bulk.update
+
+# Send email immediately
+bulk.send
+
+# Send email 2 minutes later
+bulk.send Time.now + 120
+```
+
+### アドレスのCSVアップロード
+
+```ruby
+bulk = Blastengine::Bulk.new
+bulk.from email: config["from"]["email"], name: config["from"]["name"]
+bulk.subject = "Test bulk email, 2 minute later"
+bulk.text_part = "This is a test email to __name__"
+bulk.register
+
+job = bulk.import "./spec/example.csv"
+
+while !job.finish?
+    puts job.percentage
+end
+
+# Result of importing email addresses
+job.total_count
+job.success_count
+job.failed_count
+job.error_file_url
+
+# Get error if there is it
+job.error_message
 ```
 
 ## License

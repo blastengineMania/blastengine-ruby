@@ -1,9 +1,9 @@
 require "time"
 
 module Blastengine
-	class Bulk
+	class Bulk < Base
 		include Blastengine
-		attr_accessor :subject, :text_part, :encode, :html_part, :attachments, :delivery_id
+		attr_accessor :subject, :text_part, :encode, :html_part, :attachments, :delivery_id, :job
 		def initialize
 			@to = []
 			@attachments = []
@@ -70,16 +70,6 @@ module Blastengine
 		end
 
 		#
-		# バルクメールの削除
-		#
-		def delete
-			path = "/deliveries/#{@delivery_id}"
-			# API実行
-			res = @@client.delete path
-			return res["delivery_id"]
-		end
-
-		#
 		# バルクメールの送信
 		#
 		def send(date = nil)
@@ -93,6 +83,15 @@ module Blastengine
 			res = @@client.patch path, data
 			# エラーがあったら例外を投げるので、この場合は通常終了
 			return res["delivery_id"]
+		end
+
+		def import(file, ignore_errors = false)
+			# APIリクエスト用のパス
+			path = "/deliveries/#{@delivery_id}/emails/import"
+			# API実行
+			res = @@client.post path, {ignore_errors: ignore_errors}, [file]
+			@job = Blastengine::Job.new res["job_id"]
+			return @job
 		end
 	end
 end

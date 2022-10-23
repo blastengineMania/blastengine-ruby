@@ -108,6 +108,16 @@ module Blastengine
 		end
 
 		#
+		# GETリクエストを行う
+		#
+		def get(path, binary = false)
+			# リクエスト実行
+			res = self.conn.get("#{BASE_PATH}#{path}")
+			# レスポンスを処理
+			return self.handle_response res, binary
+		end
+
+		#
 		# POSTリクエストを行う
 		#
 		def post(path, data, attachments = [])
@@ -149,13 +159,13 @@ module Blastengine
 		#
 		# レスポンスのハンドリング用
 		# 
-		def handle_response(res)
+		def handle_response(res, binary = false)
 			# レスポンスをJSONパース
-			json = JSON.parse res.body
+			body = binary ? res.body : JSON.parse(res.body)
 			# 200または201なら、レスポンスを返す
-			return json if res.status == 200 or res.status == 201
+			return body if res.status == 200 or res.status == 201
 			# それ以外はエラーを生成して例外処理
-			message = json["error_messages"].map{|key, value| "Error in #{key} (#{value})"}.join("\n")
+			message = body["error_messages"].map{|key, value| "Error in #{key} (#{value})"}.join("\n")
 			@@last_error = Blastengine::Error.new message
 			raise @@last_error
 		end
