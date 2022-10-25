@@ -37,11 +37,5 @@ module Blastengine
 			res = @@client.delete path
 			return res["delivery_id"]
 		end
-
-		def report
-			report = Blastengine::Report.new @delivery_id
-			report.create
-			report
-		end
 	end
 end

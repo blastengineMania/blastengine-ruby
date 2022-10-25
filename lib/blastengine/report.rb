@@ -4,6 +4,7 @@ module Blastengine
 		attr_accessor :job_id, :delivery_id, :percentage, :status, :mail_open_file_url, :total_count, :report
 		def initialize delivery_id
 			@delivery_id = delivery_id
+			create
 		end
 
 		def create

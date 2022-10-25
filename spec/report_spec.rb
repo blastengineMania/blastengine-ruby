@@ -9,9 +9,7 @@ RSpec.describe 'Bulk test' do
 		end
 		context 'Get report' do
 			it "Get report" do
-				transaction = Blastengine::Transaction.new
-				transaction.delivery_id = 681
-				report = transaction.report
+				report = Blastengine::Report.new 681
 				while !report.finish?
 					expect(report.percentage).to be < 100
 				end
