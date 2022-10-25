@@ -32,14 +32,15 @@ RSpec.describe 'Bulk test' do
 				bulk.from email: config["from"]["email"], name: config["from"]["name"]
 				bulk.subject = "Test bulk email"
 				bulk.text_part = "This is a test email to __name__"
+				bulk.html_part = "<p>This is a test email to __name__</p>"
 				begin
 					delivery_id = bulk.register
 					expect(delivery_id).to be_an(Integer)
 					bulk.add "atsushi+1@moongift.co.jp", {name: "Atsushi 1"}
 					bulk.add "atsushi+2@moongift.co.jp", {name: "Atsushi 2"}
 					bulk.update
-					# bulk.send
-					bulk.delete
+					bulk.send
+					# bulk.delete
 				rescue => e
 					puts e
 				end
@@ -58,10 +59,18 @@ RSpec.describe 'Bulk test' do
 					bulk.update
 					# 2 minutes later
 					bulk.send Time.now + 120
-					bulk.delete
+					sleep 2
+					bulk.get
+					expect(bulk.status).to eq("RESERVE")
+					bulk.cancel
+					sleep 2
+					bulk.get
+					expect(bulk.status).to eq("EDIT")
 				rescue => e
 					puts e
 				end
+				sleep 2
+				bulk.delete
 			end
 
       it "Import email addresses from CSV file" do
@@ -73,19 +82,15 @@ RSpec.describe 'Bulk test' do
 				begin
 					expect(delivery_id).to be_an(Integer)
 					job = bulk.import "./spec/example.csv"
-					puts job.job_id
 					while !job.finish?
 						puts job.percentage
 					end
-					puts job.total_count
-					puts job.success_count
-					puts job.failed_count
-					puts job.error_file_url
+					expect(job.percentage).to eq(100)
 					puts job.error_message
 				rescue => e
 					puts e
 				end
-				sleep 3
+				sleep 2
 				bulk.delete
 			end
 		end

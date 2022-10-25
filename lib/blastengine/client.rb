@@ -120,7 +120,7 @@ module Blastengine
 		#
 		# POSTリクエストを行う
 		#
-		def post(path, data, attachments = [])
+		def post(path, data = {}, attachments = [])
 			# リクエストボディの生成
 			params = self.post_data data, attachments
 			# リクエスト実行

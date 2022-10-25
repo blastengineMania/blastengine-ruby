@@ -1,9 +1,5 @@
-require "time"
-require "zip"
-require "tempfile"
-
 module Blastengine
-	class Job < Base
+	class Job < Download
 		include Blastengine
 		attr_accessor :job_id, :percentage, :status, :error_file_url, :success_count, :failed_count, :total_count
 		def initialize id
@@ -28,13 +24,7 @@ module Blastengine
 			return nil if @error_file_url.nil?
 			path = "/deliveries/-/emails/import/#{@job_id}/errorinfo/download"
 			res = @@client.get path, true
-			f = Tempfile.create("blastengine")
-			f.binmode
-			f.write res
-			f.flush
-			path = f.path
-			input = Zip::File.open path
-			@error_message = input.read input.entries[0].to_s
+			@error_message = download res
 			@error_message
 		end
 	end
