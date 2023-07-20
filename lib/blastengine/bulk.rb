@@ -1,6 +1,7 @@
 require "time"
 require "tempfile"
 require "csv"
+require "date"
 
 module Blastengine
 	class Bulk < Base

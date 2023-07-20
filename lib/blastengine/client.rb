@@ -5,6 +5,7 @@ require "faraday"
 require "faraday/multipart"
 require "json"
 require "mini_mime"
+require "date"
 
 #
 # Blastengine SDKのモジュール

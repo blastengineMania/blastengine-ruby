@@ -1,3 +1,5 @@
+require 'date'
+
 module Blastengine
 	class Transaction < Base
 		include Blastengine
