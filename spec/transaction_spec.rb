@@ -12,8 +12,11 @@ RSpec.describe 'Transaction test' do
 				transaction = Blastengine::Transaction.new
 				transaction.from email: config["from"]["email"], name: config["from"]["name"]
 				transaction.to << config["to"]
+				transaction.insert_code = {
+					name1: "name 1",
+				}
 				transaction.subject = "Test email"
-				transaction.text_part = "This is a test email"
+				transaction.text_part = "This is a test email __name1__"
 				begin
 					delivery_id = transaction.send
 					# Check delivery_id is integer

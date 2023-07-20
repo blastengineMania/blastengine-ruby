@@ -28,13 +28,71 @@ APIキーとユーザー名はblastengineのサイトで取得してください
 client = Blastengine.initialize api_key: "API_KEY", user_name: "YOUR_USER_NAME"
 ```
 
+### メール送信
+
+```ruby
+mail = Blastengine::Mail.new
+mail.from email: "admin@example.com", name: "Administrator"
+mail.addTo email: config["to"], insert_code: { name1: "name 1" }
+mail.subject = "Test email"
+mail.text_part = "This is a test email __name1__"
+mail.html_part = "<html><body>This is a test email __name1__</body></html>"
+mail.attachments << "README.md"
+bol = mail.send
+expect(bol).to be true
+delivery_id = mail.delivery_id
+expect(delivery_id).to be_an(Integer)
+```
+
+送信先は制限なく登録できます。
+
+```ruby
+mail = Blastengine::Mail.new
+mail.from email: "admin@example.com", name: "Administrator"
+10000.times do |i|
+    mail.addTo email: "bulk#{i}@example.jp", insert_code: { name1: "name #{i}" }
+end
+mail.subject = "Test email"
+mail.text_part = "This is a test email __name1__"
+mail.html_part = "<html><body>This is a test email __name1__</body></html>"
+mail.attachments << "README.md"
+bol = mail.send
+expect(bol).to be true
+delivery_id = mail.delivery_id
+expect(delivery_id).to be_an(Integer)
+```
+
+### メール検索
+
+```ruby
+params = {
+    "delivery_start": Time.now - 60 * 60 * 24 * 30,
+    "delivery_end": Time.now,
+    "delivery_type": ["BULK"],
+    "status": ["EDIT", "SENT"]
+}
+ary = Blastengine::Mail.find params
+ary[0].delivery_type # BULK
+ary[0].status # SENT
+```
+
+### 配信ログ検索
+
+```ruby
+params = {
+    "delivery_type": ["BULK"],
+    "status": ["EDIT", "SENT"]
+}
+ary = Blastengine::Log.find params
+```
+
 ### トランザクションメール
 
 #### テキストメール
 
 ```ruby
 transaction = Blastengine::Transaction.new
-transaction.from "admin@example.com", "Administrator"
+transaction.from email: "admin@example.com", name: "Administrator"
 transaction.to = "user@example.jp"
 transaction.subject = "Test subject"
 transaction.text_part = "This is a test email"
@@ -67,8 +125,8 @@ bulk.text_part = "This is a test email to __name__"
 bulk.register
 
 # Add address
-bulk.add "test1@example.jp", {name: "User 1"}
-bulk.add "test2@example.jp", {name: "User 2"}
+bulk.addTo "test1@example.jp", {name: "User 1"}
+bulk.addTo "test2@example.jp", {name: "User 2"}
 bulk.update
 
 # Send email immediately

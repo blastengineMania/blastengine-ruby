@@ -1,4 +1,6 @@
 require "time"
+require "tempfile"
+require "csv"
 
 module Blastengine
 	class Bulk < Base
@@ -40,7 +42,7 @@ module Blastengine
 		#
 		# 受信者の追加
 		#
-		def add(email, params = {})
+		def addTo(email, params = {})
 			@to << {
 				email: email,
 				insert_code: params.map{|key, value| {
@@ -54,6 +56,14 @@ module Blastengine
 		# バルクメールの更新
 		#
 		def update
+			if @to.size > 50
+				return self.csv_update
+			else
+				return self.normal_update
+			end
+		end
+
+		def normal_update
 			# APIリクエスト用のパス
 			path = "/deliveries/bulk/update/#{@delivery_id}"
 			data = {
@@ -69,6 +79,36 @@ module Blastengine
 			return res["delivery_id"]
 		end
 
+		def csv_update
+			f = Tempfile.create(['blastengine', '.csv'])
+			f.close
+			csv = CSV.open(f.path, "w")
+			# ヘッダーの作成
+			headers = ["email"]
+			@to.each do |to|
+				to[:insert_code].each do |insert_code|
+					headers << insert_code[:key] if headers.index(insert_code[:key]) == nil
+				end
+			end
+			csv.puts headers
+			@to.each do |to|
+				lines = [to[:email]]
+				headers.each do |header|
+					next if header == "email"
+					insert_code = to[:insert_code].find{|insert_code| insert_code[:key] == header}
+					lines << insert_code[:value] if insert_code != nil
+				end
+				csv.puts lines
+			end
+			csv.close
+			job = self.import f.path
+			while !job.finish?
+				sleep 1
+			end
+			File.unlink f.path
+			@delivery_id
+		end
+
 		#
 		# バルクメールの送信
 		#
@@ -82,6 +122,7 @@ module Blastengine
 			# API実行
 			res = @@client.patch path, data
 			# エラーがあったら例外を投げるので、この場合は通常終了
+			@delivery_id = res["delivery_id"]
 			return res["delivery_id"]
 		end
 

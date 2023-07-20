@@ -10,6 +10,8 @@ require "blastengine/job"
 require "blastengine/usage"
 require "blastengine/email"
 require "blastengine/report"
+require "blastengine/mail"
+require "blastengine/log"
 
 module Blastengine
   class Error < StandardError; end

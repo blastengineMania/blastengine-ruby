@@ -10,3 +10,4 @@
 spec/test.jpg
 spec/config.json
 blastengine-0.1.0.gem
+*.gem

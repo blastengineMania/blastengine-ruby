@@ -36,8 +36,8 @@ RSpec.describe 'Bulk test' do
 				begin
 					delivery_id = bulk.register
 					expect(delivery_id).to be_an(Integer)
-					bulk.add "atsushi+1@moongift.co.jp", {name: "Atsushi 1"}
-					bulk.add "atsushi+2@moongift.co.jp", {name: "Atsushi 2"}
+					bulk.addTo "atsushi+1@moongift.co.jp", {name: "Atsushi 1"}
+					bulk.addTo "atsushi+2@moongift.co.jp", {name: "Atsushi 2"}
 					bulk.update
 					bulk.send
 					# bulk.delete
@@ -54,8 +54,8 @@ RSpec.describe 'Bulk test' do
 				begin
 					delivery_id = bulk.register
 					expect(delivery_id).to be_an(Integer)
-					bulk.add "atsushi+1@moongift.co.jp", {name: "Atsushi 1"}
-					bulk.add "atsushi+2@moongift.co.jp", {name: "Atsushi 2"}
+					bulk.addTo "atsushi+1@moongift.co.jp", {name: "Atsushi 1"}
+					bulk.addTo "atsushi+2@moongift.co.jp", {name: "Atsushi 2"}
 					bulk.update
 					# 2 minutes later
 					bulk.send Time.now + 120
