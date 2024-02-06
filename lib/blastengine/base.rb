@@ -15,6 +15,11 @@ module Blastengine
 			@@client
 		end
 
+		def unsubscribe(url: "", email: "")
+			@list_unsubscribe = {url: url, email: email}
+			self
+		end
+
 		def sets(params)
 			params.each do |key, value|
 				self.set(key, value)

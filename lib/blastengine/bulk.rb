@@ -6,11 +6,15 @@ require "date"
 module Blastengine
 	class Bulk < Base
 		include Blastengine
-		attr_accessor :subject, :text_part, :encode, :html_part, :attachments, :delivery_id, :job
+		attr_accessor :subject, :text_part, :encode, :html_part, :attachments, :delivery_id, :job, :list_unsubscribe
 		def initialize
 			@to = []
 			@attachments = []
 			@encode = "UTF-8"
+			@list_unsubscribe = {
+				url: "",
+				email: ""
+			}
 		end
 
 		#
@@ -34,6 +38,12 @@ module Blastengine
 			}
 			# HTMLパートがある場合は追加
 			data[:html_part] = @html_part unless @html_part.nil?
+			# 退会リンクがある場合は追加
+			unless @list_unsubscribe.nil?
+				data[:list_unsubscribe] = {}
+				data[:list_unsubscribe][:url] = @list_unsubscribe[:url] if !@list_unsubscribe[:url].nil? && @list_unsubscribe[:url] != ""
+				data[:list_unsubscribe][:mailto] = "mailto:#{@list_unsubscribe[:email]}" if !@list_unsubscribe[:email].nil? && @list_unsubscribe[:email] != ""
+			end
 			# API実行
 			res = @@client.post path, data, @attachments
 			@delivery_id = res["delivery_id"]
@@ -75,6 +85,13 @@ module Blastengine
 			data[:from] = @_from unless @_from.nil?
 			data[:text_part] = @text_part unless @text_part.nil?
 			data[:html_part] = @html_part unless @html_part.nil?
+
+			# 退会リンクがある場合は追加
+			unless @list_unsubscribe.nil?
+				data[:list_unsubscribe] = {}
+				data[:list_unsubscribe][:url] = @list_unsubscribe[:url] if !@list_unsubscribe[:url].nil? && @list_unsubscribe[:url] != ""
+				data[:list_unsubscribe][:mailto] = "mailto:#{@list_unsubscribe[:email]}" if !@list_unsubscribe[:email].nil? && @list_unsubscribe[:email] != ""
+			end
 			# API実行
 			res = @@client.put path, data
 			return res["delivery_id"]

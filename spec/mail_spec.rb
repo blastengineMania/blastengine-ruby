@@ -33,6 +33,20 @@ RSpec.describe 'Mail test' do
 				expect(delivery_id).to be_an(Integer)
 			end
 
+			it "Send transaction mail" do
+				mail = Blastengine::Mail.new
+				mail.from email: config["from"]["email"], name: config["from"]["name"]
+				mail.addTo email: config["to"], insert_code: { name1: "name 1", hash: "aaaa" }
+				mail.subject = "Test unsubscribe transaction email"
+				mail.text_part = "This is a test email __name1__"
+				mail.html_part = "<html><body>This is a test email __name1__</body></html>"
+				mail.unsubscribe email: "unsubscribe+__hash__@moongift.co.jp"
+				bol = mail.send
+				expect(bol).to be true
+				delivery_id = mail.delivery_id
+				expect(delivery_id).to be_an(Integer)
+			end
+
 			it "Send transaction mail w/ attachment" do
 				mail = Blastengine::Mail.new
 				mail.from email: config["from"]["email"], name: config["from"]["name"]
@@ -55,6 +69,22 @@ RSpec.describe 'Mail test' do
 				mail.subject = "Test email"
 				mail.text_part = "This is a test email __name1__"
 				mail.html_part = "<html><body>This is a test email __name1__</body></html>"
+				mail.attachments << "README.md"
+				bol = mail.send
+				expect(bol).to be true
+				delivery_id = mail.delivery_id
+				expect(delivery_id).to be_an(Integer)
+			end
+
+			it "Send bulk mail with unsubscribe" do
+				mail = Blastengine::Mail.new
+				mail.from email: config["from"]["email"], name: config["from"]["name"]
+				mail.addTo email: "user1@moongift.co.jp", insert_code: { name1: "name 1", hash: "aaaa" }
+				mail.addTo email: "user2@moongift.co.jp", insert_code: { name1: "name 2", hash: "bbbb" }
+				mail.subject = "Test unsubscribe email by mail class"
+				mail.text_part = "This is a test email __name1__"
+				mail.html_part = "<html><body>This is a test email __name1__</body></html>"
+				mail.unsubscribe email: "info+__hash__@moongift.co.jp"
 				mail.attachments << "README.md"
 				bol = mail.send
 				expect(bol).to be true

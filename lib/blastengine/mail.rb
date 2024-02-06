@@ -3,13 +3,18 @@ require 'date'
 module Blastengine
 	class Mail < Base
 		include Blastengine
-		attr_accessor :to, :cc, :bcc, :subject, :text_part, :encode, :html_part, :attachments, :delivery_id
+		attr_accessor :to, :cc, :bcc, :subject, :text_part, :encode, :html_part, :attachments, :delivery_id, :list_unsubscribe
+
 		def initialize
 			@to = []
 			@cc = []
 			@bcc = []
 			@attachments = []
 			@encode = "UTF-8"
+			@list_unsubscribe = {
+				url: "",
+				email: ""
+			}
 		end
 
 		#
@@ -50,6 +55,7 @@ module Blastengine
 			bulk.encode = @encode
 			bulk.text_part = @text_part
 			bulk.html_part = @html_part
+			bulk.unsubscribe url: @list_unsubscribe[:url], email: @list_unsubscribe[:email]
 			if @attachments.size > 0
 				bulk.attachments = @attachments
 			end
@@ -74,6 +80,7 @@ module Blastengine
 			transaction.insert_code = @to[0][:insert_code] if @to[0][:insert_code].size > 0
 			transaction.cc = @cc if @cc.size > 0
 			transaction.bcc = @bcc if @bcc.size > 0
+			transaction.unsubscribe url: @list_unsubscribe[:url], email: @list_unsubscribe[:email]
 			if @attachments.size > 0
 				transaction.attachments = @attachments
 			end
@@ -98,6 +105,20 @@ module Blastengine
 			end
 			query_string = URI.encode_www_form(params)
 			url = "/deliveries?#{query_string}";
+			res = Mail.client.get url
+			return res['data'].map {|params| Mail.from_hash params }
+		end
+
+		def self.all(params = {})
+			Hash[ params.map{|k,v| [k.to_sym, v] } ]
+			if params[:delivery_start] != nil
+				params[:delivery_start] = params[:delivery_start].iso8601
+			end
+			if params[:delivery_end] != nil
+				params[:delivery_end] = params[:delivery_end].iso8601
+			end
+			query_string = URI.encode_www_form(params)
+			url = "/deliveries/all?#{query_string}";
 			res = Mail.client.get url
 			return res['data'].map {|params| Mail.from_hash params }
 		end

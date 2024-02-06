@@ -10,10 +10,28 @@ RSpec.describe 'Mail test' do
 		context 'Find log' do
 			it "Find log" do
 				params = {
-					"delivery_type": ["BULK"],
-					"status": ["EDIT", "SENT"]
+					delivery_type: ["BULK"],
+					status: ["EDIT", "SENT"]
 				}
 				ary = Blastengine::Log.find params
+			end
+		end
+		context 'Find mail' do
+			it "by find method" do
+				params = {
+					delivery_type: ["BULK"],
+					status: ["EDIT", "SENT"],
+					list_unsubscribe_mailto: "moongift",
+				}
+				ary = Blastengine::Mail.find params
+				puts ary
+			end
+			it "by all method" do
+				params = {
+					delivery_type: ["BULK"],
+					status: ["EDIT", "SENT"]
+				}
+				# ary = Blastengine::Mail.all params
 			end
 		end
 	end

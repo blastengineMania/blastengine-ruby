@@ -3,7 +3,7 @@ require 'date'
 module Blastengine
 	class Transaction < Base
 		include Blastengine
-		attr_accessor :to, :cc, :bcc, :subject, :text_part, :encode, :html_part, :attachments, :insert_code
+		attr_accessor :to, :cc, :bcc, :subject, :text_part, :encode, :html_part, :attachments, :insert_code, :list_unsubscribe
 		def initialize
 			@to = ""
 			@cc = []
@@ -11,6 +11,10 @@ module Blastengine
 			@attachments = []
 			@encode = "UTF-8"
 			@insert_code = {}
+			@list_unsubscribe = {
+				url: "",
+				email: ""
+			}
 		end
 
 		#
@@ -45,6 +49,11 @@ module Blastengine
 						value: value
 					}
 				end
+			end
+			unless @list_unsubscribe.nil?
+				data[:list_unsubscribe] = {}
+				data[:list_unsubscribe][:url] = @list_unsubscribe[:url] if !@list_unsubscribe[:url].nil? && @list_unsubscribe[:url] != ""
+				data[:list_unsubscribe][:mailto] = "mailto:#{@list_unsubscribe[:email]}" if !@list_unsubscribe[:email].nil? && @list_unsubscribe[:email] != ""
 			end
 			# API実行
 			res = @@client.post path, data, @attachments

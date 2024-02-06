@@ -41,6 +41,24 @@ RSpec.describe 'Transaction test' do
 					puts e
 				end
 			end
+      it "Success to send email w/ unsubscribe" do
+				transaction = Blastengine::Transaction.new
+				transaction.from email: config["from"]["email"], name: config["from"]["name"]
+				transaction.to << config["to"]
+				transaction.subject = "Test email w/ unsubscribe"
+				transaction.text_part = "This is a test email with attachments"
+				transaction.insert_code = {
+					hash: "aaaa"
+				}
+				transaction.unsubscribe url: "https://example.com/unsubscribe/__hash__", email: "unsubscribed+__hash__@moongift.co.jp"
+				begin
+					delivery_id = transaction.send
+					# Check delivery_id is integer
+					expect(delivery_id).to be_an(Integer)
+				rescue => e
+					puts e
+				end
+			end
 		end
 	end
 end

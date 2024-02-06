@@ -73,6 +73,30 @@ RSpec.describe 'Bulk test' do
 				bulk.delete
 			end
 
+      it "Success to send text email w/ unsubscribe" do
+				bulk = Blastengine::Bulk.new
+				bulk.from email: config["from"]["email"], name: config["from"]["name"]
+				bulk.subject = "Test bulk unsubscribe email"
+				bulk.text_part = "This is a test email to __name__"
+				begin
+					delivery_id = bulk.register
+					expect(delivery_id).to be_an(Integer)
+					bulk.addTo "atsushi+1@moongift.co.jp", {name: "Atsushi 1", hash: "aaaa"}
+					bulk.addTo "atsushi+2@moongift.co.jp", {name: "Atsushi 2", hash: "bbbb"}
+					bulk.unsubscribe url: "https://example.com/unsubscribe/__hash__"
+					bulk.update
+					# 2 minutes later
+					bulk.send
+					sleep 5
+					bulk.get
+					expect(bulk.status).to eq("SENDING")
+				rescue => e
+					puts e
+				end
+				sleep 2
+				bulk.delete
+			end
+
       it "Import email addresses from CSV file" do
 				bulk = Blastengine::Bulk.new
 				bulk.from email: config["from"]["email"], name: config["from"]["name"]
@@ -83,7 +107,6 @@ RSpec.describe 'Bulk test' do
 					expect(delivery_id).to be_an(Integer)
 					job = bulk.import "./spec/example.csv"
 					while !job.finish?
-						puts job.percentage
 					end
 					expect(job.percentage).to eq(100)
 					puts job.error_message
