@@ -97,6 +97,17 @@ module Blastengine
 		end
 
 		#
+		# メール送信のキャンセル
+		#
+		def cancel
+			# APIリクエスト用のパス
+			path = "/deliveries/#{@delivery_id}/cancel"
+			# API実行
+			res = @@client.patch path, {}
+			return res["delivery_id"]
+		end
+
+		#
 		# バルクメールの削除
 		#
 		def delete

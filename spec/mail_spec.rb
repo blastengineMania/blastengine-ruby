@@ -1,5 +1,6 @@
 require "../blastengine/lib/blastengine.rb"
 require "json"
+require "date"
 
 config = JSON.parse(File.read("./spec/config.json"))
 RSpec.describe 'Mail test' do
@@ -107,6 +108,27 @@ RSpec.describe 'Mail test' do
 				delivery_id = mail.delivery_id
 				expect(delivery_id).to be_an(Integer)
 			end
+
+			it "Cancel bulk mail" do
+				mail = Blastengine::Mail.new
+				mail.from email: config["from"]["email"], name: config["from"]["name"]
+				mail.addTo email: "user@moongift.co.jp", insert_code: { name1: "name 2" }
+				mail.subject = "Test email"
+				mail.text_part = "This is a test email __name1__"
+				mail.html_part = "<html><body>This is a test email __name1__</body></html>"
+				# 30 sec later now
+				bol = mail.send(DateTime.now + Rational(30, 86400))
+				expect(bol).to be true
+				delivery_id = mail.delivery_id
+				expect(delivery_id).to be_an(Integer)
+				mail.get
+				expect(mail.status).to eq "RESERVE"
+				delivery_id = mail.cancel
+				expect(delivery_id).to be_an(Integer)
+				mail.get
+				expect(mail.status).to eq "EDIT"
+			end
+
 		end
 	end
 end

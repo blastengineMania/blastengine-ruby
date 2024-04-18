@@ -42,7 +42,7 @@ module Blastengine
 				raise "CC or BCC is not supported when sending at a specified time." if date != nil
 				raise "CC or BCC is not supported when sending to multiple recipients." if @to.size > 1
 			end
-			if date != nil || @to.size == 1
+			if date == nil
 				return self.sendTransaction();
 			end
 			return self.sendBulk(date)

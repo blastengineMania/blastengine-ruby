@@ -144,14 +144,6 @@ module Blastengine
 			return res["delivery_id"]
 		end
 
-		def cancel
-			# APIリクエスト用のパス
-			path = "/deliveries/#{@delivery_id}/cancel"
-			# API実行
-			res = @@client.patch path, {}
-			return res["delivery_id"]
-		end
-
 		def import(file, ignore_errors = false)
 			# APIリクエスト用のパス
 			path = "/deliveries/#{@delivery_id}/emails/import"
